@@ -270,7 +270,7 @@ void _putpixel(int x, int y, int colour, s_screen *screen, int alpha)
 {
     int pixind;
     unsigned char *lut;
-    if((unsigned)x > screen->width || (unsigned)y > screen->height)
+    if((unsigned)x >= (unsigned)screen->width || (unsigned)y >= (unsigned)screen->height)
     {
         return;
     }

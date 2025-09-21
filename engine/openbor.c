@@ -44341,7 +44341,7 @@ void spawnplayer(int index)
     //////////////////checking holes/ walls///////////////////////////////////
     for(xc = 0; xc < videomodes.hRes / 4; xc++)
     {
-        if(p.position.x > videomodes.hRes)
+        if(p.position.x >= videomodes.hRes)
         {
             p.position.x -= videomodes.hRes;
         }
