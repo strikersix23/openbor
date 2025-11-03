@@ -72,6 +72,7 @@ fi
 
 cd $(dirname $(readlink -f $0))
 cd ../
+chmod +x version.sh
 ./version.sh
 cd android
 ./gradlew clean
