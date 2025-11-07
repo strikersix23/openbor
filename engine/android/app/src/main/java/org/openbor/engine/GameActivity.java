@@ -22,39 +22,22 @@ package org.openbor.engine;
 
 import org.libsdl.app.SDLActivity;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-
 import android.util.Log;
 import android.os.Bundle;
 import android.content.Context;
 import android.os.Build;
-import android.content.pm.PackageManager;
 import android.content.pm.ApplicationInfo;
 import android.os.PowerManager;
-import android.os.PowerManager.*;
+import android.os.PowerManager.WakeLock; // Explicitly import WakeLock if you want to be specific, or keep PowerManager.*
 import android.view.View;
 import android.view.WindowManager;
-import android.content.res.*;
-import android.Manifest;
-//msmalik681 added imports for new pak copy!
-import android.os.Environment;
-import android.widget.Toast;
-//msmalik681 added import for permission check
-import androidx.core.content.ContextCompat;
-import androidx.core.app.ActivityCompat;
+import android.view.WindowManager;
 import android.os.Vibrator;
 import android.os.VibrationEffect;
-import android.view.*;
 
-//needed to fix sdk 34+ crashing
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -137,7 +120,7 @@ public Intent registerReceiver(@Nullable BroadcastReceiver receiver, IntentFilte
     super.onCreate(savedInstanceState);
     Log.v("OpenBOR", "onCreate called");
     //msmalik681 copy pak for custom apk and notify is paks folder empty
-    CopyPak();
+   // CopyPak();
 
     //CRxTRDude - Added FLAG_KEEP_SCREEN_ON to prevent screen timeout.
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -148,102 +131,6 @@ public Intent registerReceiver(@Nullable BroadcastReceiver receiver, IntentFilte
     if (!GameActivity.wakeLock.isHeld())
     {
       GameActivity.wakeLock.acquire();
-    }
-  }
-
-  /**
-   * Proceed in copying paks files, or just prepare the destination Paks directory depending
-   * on which type of app it is.
-   */
-  public void CopyPak()
-  {
-    try {
-      Context ctx = getContext();
-      Context appCtx = getApplicationContext();
-      String toast = null;
-
-      // if package name is literally "org.openbor.engine" then we have no need to copy any .pak files
-      if (appCtx.getPackageName().equals("org.openbor.engine"))
-      {
-        // Default output folder
-        File outFolderDefault = new File(Environment.getExternalStorageDirectory() + "/OpenBOR/Paks");
-
-        if (!outFolderDefault.isDirectory())
-        {
-          outFolderDefault.mkdirs();
-          toast = "Folder: (" + outFolderDefault + ") is empty!";
-          Toast.makeText(appCtx, toast, Toast.LENGTH_LONG).show();
-        }
-        else
-        {
-          String[] files = outFolderDefault.list();
-          if (files.length == 0)
-          {
-            // directory is empty
-            toast = "Paks Folder: (" + outFolderDefault + ") is empty!";
-            Toast.makeText(appCtx, toast, Toast.LENGTH_LONG).show();
-          }
-        }
-      }
-      // otherwise it acts like a dedicated app (commercial title, standalone app)
-      // intend to work with pre-baked single .pak file at build time
-      else
-      {
-        String version = null;
-        // versionName is "android:versionName" in AndroidManifest.xml
-        version = appCtx.getPackageManager().getPackageInfo(appCtx.getPackageName(), 0).versionName;  // get version number as string
-        // set local output folder (primary shared/external storage)
-        File outFolder = new File(ctx.getExternalFilesDir(null) + "/Paks");
-        // set local output filename as version number
-        File outFile = new File(outFolder, version + ".pak");
-
-        // check if existing pak directory is actually directory, and pak file with matching version
-        // for this build is there, if not then delete all files residing in such
-        // directory (old pak files) preparing for updating new one
-        if (outFolder.isDirectory() && !outFile.exists()) // if local folder true and file does not match version empty folder
-        {
-          toast = "Updating please wait!";
-          String[] children = outFolder.list();
-          for (int i = 0; i < children.length; i++)
-          {
-            new File(outFolder, children[i]).delete();
-          }
-        }
-        else
-        {
-          toast = "First time setup, please wait...";
-        }
-
-        if (!outFile.exists())
-        {
-          Toast.makeText(appCtx, toast, Toast.LENGTH_LONG).show();
-          outFolder.mkdirs();
-
-		  //custom pak should be saved in "app\src\main\assets\bor.pak"
-		  InputStream in = ctx.getAssets().open("bor.pak");
-          FileOutputStream out = new FileOutputStream(outFile);
-
-          copyFile(in, out);
-          in.close();
-          in = null;
-          out.flush();
-          out.close();
-          out = null;
-        }
-      }
-    } catch (IOException e) {
-      // not handled
-    } catch (Exception e) {
-      // not handled
-    }
-  }
-
-  private void copyFile(InputStream in, OutputStream out) throws IOException {
-    byte[] buffer = new byte[1024];
-    int read;
-    while ((read = in.read(buffer)) != -1)
-    {
-      out.write(buffer, 0, read);
     }
   }
 
