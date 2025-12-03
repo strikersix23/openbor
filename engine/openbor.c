@@ -39390,15 +39390,25 @@ void player_die()
     player[playerindex].spawnhealth = self->modeldata.health;
     player[playerindex].spawnmp = self->modeldata.mp;
 
-    if(self->modeldata.death_config_flags & ~(DEATH_CONFIG_REMOVE_CORPSE_AIR | DEATH_CONFIG_REMOVE_CORPSE_GROUND))
-    {
-        kill_entity(self, KILL_ENTITY_TRIGGER_PLAYER_DEATH);
-    }
-    else
-    {
+    /* 
+    * Handle the body. If any corpse flags
+    * are set, we leave entity on screen 
+    * and make it inert. Otherwise we can
+    * just run kill function to remove.
+    * 
+    * REMOVE_CORPSE_* flags refer to how 
+    * the live entity is removed from the 
+    * game while leaving a corpse behind.
+    */
+
+    const e_death_config_flags leave_corpse = DEATH_CONFIG_REMOVE_CORPSE_AIR | DEATH_CONFIG_REMOVE_CORPSE_GROUND;
+
+    if (self->modeldata.death_config_flags & leave_corpse) {
         self->think = NULL;
         self->takeaction = NULL;
-        self->death_state |= DEATH_STATE_CORPSE;
+        self->death_state |= DEATH_STATE_CORPSE;        
+    } else {
+        kill_entity(self, KILL_ENTITY_TRIGGER_PLAYER_DEATH);
     }
 
     if(player[playerindex].lives <= 0)
