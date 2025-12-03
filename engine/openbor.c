@@ -39401,7 +39401,7 @@ void player_die()
     * game while leaving a corpse behind.
     */
 
-    const e_death_config_flags leave_corpse = DEATH_CONFIG_REMOVE_CORPSE_AIR | DEATH_CONFIG_REMOVE_CORPSE_GROUND;
+    static const e_death_config_flags leave_corpse = DEATH_CONFIG_REMOVE_CORPSE_AIR | DEATH_CONFIG_REMOVE_CORPSE_GROUND;
 
     if (self->modeldata.death_config_flags & leave_corpse) {
         self->think = NULL;
